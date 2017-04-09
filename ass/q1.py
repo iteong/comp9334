@@ -11,19 +11,19 @@ def main():
     # output rate of system, out_sys (trans/sec) = number of completed jobs/T
     out_sys = 1231/T
 
+    print("(Q1a)")
     # SERVICE DEMAND LAW
     # service demand of device, svc_dd (sec) = util/output rate
     svc_dd_cpu = util_cpu / out_sys
     svc_dd_d1 = util_disk1 / out_sys
     svc_dd_d2 = util_disk2 / out_sys
-    svc_dd_d3 = util_disk3 / out_sys
-
-    print("(Q1a)")
+    svc_dd_d3 = util_disk3 / out_sys   
     print("Service demand for CPU is: " + str(svc_dd_cpu) + " sec")
     print("Service demand for Disk 1 is: " + str(svc_dd_d1) + " sec")
     print("Service demand for Disk 2 is: " + str(svc_dd_d2) + " sec")
     print("Service demand for Disk 3 is: " + str(svc_dd_d3) + " sec")
 
+    print("(Q1b)")
     # number of active terminals = number of interactive clients = number of users
     N = 40
     
@@ -40,17 +40,14 @@ def main():
 
     # asymptotic bound is minimum of bound1 or bound2
     asymp_bound_throughput = min(bound1, bound2)
-
-    print("(Q1b)")
     print("Bound 1 is: " + str(bound1))
     print("Bound 2 is: " + str(bound2))
     print("Slope at Bound2 is: " + str(slope))
     print("Asymptotic bound on system throughput is: " + str(asymp_bound_throughput) + " jobs/sec")
-          
+
+    print("(Q1c)")
     # number of terminals = max system throughput x (think time + min response time)
     min_resp_time = (N/asymp_bound_throughput) - think_time_job
-    
-    print("(Q1c)")
     print("Minimum possible response time when number of terminals is 40: " + str(min_resp_time) + " sec")
 
 if __name__ == "__main__":
