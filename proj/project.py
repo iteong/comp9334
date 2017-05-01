@@ -9,6 +9,7 @@ def ps_server(jobs):
     global job_list
     global server
     global first_event
+    global response
 
     # base case for recursion when no jobs left to process after last job departs
     if first_event == False and len(jobs) == 0:
@@ -18,7 +19,7 @@ def ps_server(jobs):
         next_departure = np.inf
         job_list.pop(0)
         server = False
-        print("master clock: " + str(master) + ", event type: " + event_type + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list) + ", server busy: " + str(server))
+        print("master clock: " + str(master) + ", event type: " + event_type + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list) + ", cumulative response time: " + str(response) + ", server busy: " + str(server))
         return
     
     # tracking time of last event
@@ -49,6 +50,10 @@ def ps_server(jobs):
             depart_list.append(job[1])
         min_index, min_value = min(enumerate(depart_list), key=operator.itemgetter(1))
         time_lapsed = round(time_lapsed - min_value, 2)
+        
+        # calculate cumulative response time based on departing job's arrival and departure times
+        response += (master - job_list[min_index][0])
+        
         job_list.pop(min_index)
     
     # if current iteration is not the first round
@@ -93,7 +98,7 @@ def ps_server(jobs):
         # only remove job from jobs if there is an arrival next
         jobs.pop(0)
 
-    print("master clock: " + str(master) + ", event type: " + event_type + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list) + ", server busy: " + str(server))
+    print("master clock: " + str(master) + ", event type: " + event_type + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list) + ", cumulative response time: " + str(response) + ", server busy: " + str(server))
     
     if first_event == True:
         # prepare for base case in recursion
@@ -114,8 +119,10 @@ server = False
 next_arrival = jobs[0][0]
 # assuming no future arrivals
 next_departure = np.inf
+# cumulative response time for departing events from time of their arrivals
+response = 0
    
 job_list = []
 
-print("master clock: " + str(master) + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list)  + ", server busy: " + str(server))
+print("master clock: " + str(master) + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list)  + ", cumulative response time: " + str(response) + ", server busy: " + str(server))
 ps_server(jobs)
