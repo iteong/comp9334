@@ -16,38 +16,34 @@ def ps_server(jobs):
         event_type = "DEPARTURE"
         master = next_departure
         next_departure = np.inf
-        server = False
         job_list.pop(0)
-        print("master clock: " + str(master) + ", event type: " + event_type + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list))
+        server = False
+        print("master clock: " + str(master) + ", event type: " + event_type + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list) + ", server busy: " + str(server))
         return
     
-    # keeping track of the time of last event
+    # tracking time of last event
     last_event = master
 
-    # determining event type for the next event
+    # determining event type for the next event of which master clock jumps to
     if next_arrival < next_departure:
-        event_type = "ARRIVAL"
-        # master clock jumps to time of next job/arrival    
-        master = next_arrival
-        
+        event_type = "ARRIVAL"   
+        master = next_arrival       
     else:
         event_type = "DEPARTURE"
-        # master clock jumps to time of next departure
         master = next_departure 
     
-    # time lapsed since last event
+    # tracking time lapsed since last event, after master clock's jump
     time_lapsed = round(master - last_event, 2)
 
-    # keeping track of number of jobs in server since last event
+    # tracking number of jobs in server since last event
     num_jobs = len(job_list)
 
-    # only add job to job_list if event is an arrival
     if event_type == "ARRIVAL":
+        # only add job to job_list if current event is an arrival
         job = jobs[0]
-        job_list.append(job)
-        
+        job_list.append(job)       
     elif event_type == "DEPARTURE":
-    # depart job with lowest service time if event is a departure, removing it from job_list after service
+        # depart job with lowest service time if current event is a departure, removing it from job_list after servicing
         depart_list = []
         for job in job_list:
             depart_list.append(job[1])
@@ -55,39 +51,30 @@ def ps_server(jobs):
         time_lapsed = round(time_lapsed - min_value, 2)
         job_list.pop(min_index)
     
-    # copy out job_list without arrival_time for finding next job to depart
-    min_list = []
-    
-    # updating time of next departure with service time left
-    if first_event == True:       
-        for job in job_list:
-            min_list.append(job[1])
-        
-        min_index, min_value = min(enumerate(min_list), key=operator.itemgetter(1))
-        next_departure = master + (min_value * len(job_list))
-    else:
-        # update service time needed by jobs before arrival of new job in job list
+    # if current iteration is not the first round
+    if first_event != True:
+        # update service time of jobs based on event_type before the arrival of new job in job list
         if event_type == "ARRIVAL":
             for i in range(0, num_jobs):
                 diff = time_lapsed/num_jobs
-                job_list[i][1] = round(job_list[i][1] - diff, 2)
-
-            for job in job_list:
-                min_list.append(job[1])
-        
+                job_list[i][1] = round(job_list[i][1] - diff, 2)       
         elif event_type == "DEPARTURE":
             for i in range(0, len(job_list)):
                 diff = time_lapsed/(len(job_list))
                 job_list[i][1] = round(job_list[i][1] - diff, 2)
 
-            for job in job_list:
-                min_list.append(job[1])
+    # copy out jobs from job_list to min_list without its arrival_time to find next job to depart based on indexing
+    min_list = []
+    for job in job_list:
+        min_list.append(job[1])
 
-        if len(min_list) != 0:
-            min_index, min_value = min(enumerate(min_list), key=operator.itemgetter(1))
-            next_departure = master + (min_value * len(job_list))
-        else:
-            next_departure = np.inf
+    if len(min_list) != 0:
+        min_index, min_value = min(enumerate(min_list), key=operator.itemgetter(1))
+        # next departing job's service time times number of jobs (processor sharing so slowed down by number of jobs)
+        next_departure = master + (min_value * len(job_list))
+    else:
+        # if no more jobs to depart
+        next_departure = np.inf
 
     # if job list is not empty
     if len(job_list) != 0:
@@ -95,20 +82,18 @@ def ps_server(jobs):
     else:
         server = False
 
-    if len(jobs) > 0:
-        # only update arrival time if there is an arrival next
-        if event_type == "ARRIVAL" and len(jobs) != 0:
-            if len(jobs) > 1:
-                next_arrival = jobs[1][0]
-            else:
-                # if only left 1 last job to process, next_arrival equals that job's time
-                next_arrival = jobs[0][0]
+    # only update next_arrival time if there is an arrival next
+    if event_type == "ARRIVAL" and len(jobs) != 0:
+        if len(jobs) > 1:
+            next_arrival = jobs[1][0]
+        else:
+            # if only left 1 last job to process, next_arrival time equals that job's time
+            next_arrival = jobs[0][0]
 
-    print("master clock: " + str(master) + ", event type: " + event_type + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list))
-
-    # only remove job from jobs if it is an arrival next
-    if event_type == "ARRIVAL":            
+        # only remove job from jobs if there is an arrival next
         jobs.pop(0)
+
+    print("master clock: " + str(master) + ", event type: " + event_type + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list) + ", server busy: " + str(server))
     
     # recursion
     first_event = False
@@ -120,14 +105,14 @@ jobs = [[1, 2.1],[2, 3.3],[3, 1.1],[5, 0.5],[15, 1.7]]
 first_event = True
 # master clock
 master = 0
-# server = true when busy, server = false when idle
+# server = True when busy, server = False when idle
 server = False
-
+# next arrival = first job in arriving jobs
 next_arrival = jobs[0][0]
 # assuming no future arrivals
 next_departure = np.inf
    
 job_list = []
 
-print("master clock: " + str(master) + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list))
+print("master clock: " + str(master) + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list)  + ", server busy: " + str(server))
 ps_server(jobs)
