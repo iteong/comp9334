@@ -52,8 +52,8 @@ def ps_server(jobs):
         job_list.pop(min_index)
     
     # if current iteration is not the first round
-    if first_event != True:
-        # update service time of jobs based on event_type before the arrival of new job in job list
+    if first_event == False:
+        # update service time of jobs based on event_type before the arrival of new job in job_list
         if event_type == "ARRIVAL":
             for i in range(0, num_jobs):
                 diff = time_lapsed/num_jobs
@@ -76,7 +76,7 @@ def ps_server(jobs):
         # if no more jobs to depart
         next_departure = np.inf
 
-    # if job list is not empty
+    # if job_list is not empty
     if len(job_list) != 0:
         server = True
     else:
@@ -87,7 +87,7 @@ def ps_server(jobs):
         if len(jobs) > 1:
             next_arrival = jobs[1][0]
         else:
-            # if only left 1 last job to process, next_arrival time equals that job's time
+            # if only left last job to process, next_arrival time equals that job's time
             next_arrival = jobs[0][0]
 
         # only remove job from jobs if there is an arrival next
@@ -95,8 +95,11 @@ def ps_server(jobs):
 
     print("master clock: " + str(master) + ", event type: " + event_type + ", next arrival time: " + str(next_arrival) + ", next departure time: " + str(next_departure) + ", job list: " + str(job_list) + ", server busy: " + str(server))
     
+    if first_event == True:
+        # prepare for base case in recursion
+        first_event = False
+    
     # recursion
-    first_event = False
     ps_server(jobs)
 
 jobs = [[1, 2.1],[2, 3.3],[3, 1.1],[5, 0.5],[15, 1.7]]
