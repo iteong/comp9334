@@ -5,6 +5,8 @@ import math
 from datetime import datetime
 
 # INTER-ARRIVAL TIMES FOR EACH JOB
+mean_arrival_rate = 7.2
+
 def randExponential(rateLambda):
     return -math.log(1.0 - random.random()) / rateLambda
 
@@ -18,8 +20,8 @@ def readSeed(n):
             return line
     f.close()
 
-def interArrival(meanRate):
-    a1 = randExponential(meanRate)
+def interArrival():
+    a1 = randExponential(mean_arrival_rate)
     a2 = randUniform(0.75, 1.17)
     interarrival_time = a1 * a2
     return interarrival_time
@@ -50,13 +52,36 @@ f = open('seed.txt', 'a')
 f.close()
 random.seed(seed)
 
-# SERVICE TIMES FOR EACH JOB
 # number of servers switched on is s; power consumption (Watt) is power_budget or power_level
-s = int(input("Enter a number: ")) # 3, 4, 5, 6, 7, 8, 9, 10
+s = int(input("Number of servers to switch on: ")) # 3, 4, 5, 6, 7, 8, 9, 10
 
-jobs = [[1, 2.1],[2, 3.3],[3, 1.1],[5, 0.5],[15, 1.7]]
+# chosen simulation duration parameter to stop simulation
+completed_stop = int(input("Maximum number of completed jobs after a job departure: "))
+
+# chosen number of jobs being fed into the simulation
+max_num_jobs = int(input("Number of jobs being fed into the simulation in a list: "))
+
+#jobs = [[1, 2.1],[2, 3.3],[3, 1.1],[5, 0.5],[15, 1.7]]
+
+
 # master clock
 master = 0
+
+# generate a list of jobs with randomly-generated arrival times and service times
+def generateJobList(new_arrival, jobs, max_num_jobs):
+    for x in range(max_num_jobs):
+        # GENERATE A NEW JOB: randomly-generated arrival (incremental) and service times
+        new_interarrival = round(interArrival(), 2)
+        new_arrival += new_interarrival
+        new_service = round(serviceTime(s), 2)
+        jobs.append([new_arrival, new_service])
+    return jobs
+
+new_arrival = master
+jobs_init = []
+jobs = generateJobList(new_arrival, jobs_init, max_num_jobs)
+print("List of jobs to be fed: " + str(jobs))
+
 # next arrival = first job in arriving jobs
 next_arrival = jobs[0][0]
 # assuming no future arrivals, we use Inf (= infinity) to denote an empty departure event
@@ -71,17 +96,17 @@ first_event = True
 response = 0
 # number of completed jobs at the end of simulation
 completed = 0
-# chosen simulation duration parameter to stop simulation
-completed_stop = 4
 
-def ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed):
+def ps_server(s, jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed, completed_stop):
+
     # BASE CASE FOR RECURSION
     # number of completed jobs reached its chosen limit after a job departs
     if completed == completed_stop:
         return    
     else:
+        print(jobs)
         # no jobs left to process after last job departs
-        if first_event == False and len(jobs) == 0:
+        if first_event == False and len(jobs) == 0 and len(job_list) == 0:
             next_arrival = np.inf       
             event_type = "DEPARTURE"
             master = next_departure
@@ -92,7 +117,7 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
             server = False
             print("master: " + str(master) + ", type: " + event_type + ", next arrival: " + str(next_arrival) + ", next departure: " + str(next_departure) + ", job list: " + str(job_list)  + ", cumulative response: " + str(response) + ", completed jobs: " + str(completed) + ", server busy: " + str(server))
             return
-    
+
     # tracking time of last event
     last_event = master
 
@@ -103,10 +128,6 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
     else:
         event_type = "DEPARTURE"
         master = next_departure
-
-    # check length of simulation to stop before Tend
-    #if master >= Tend:
-        #return
     
     # tracking time lapsed since last event, after master clock's jump
     time_lapsed = round(master - last_event, 2)
@@ -183,7 +204,14 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
         first_event = False
     
     # recursion
-    ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed)
+    ps_server(s, jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed, completed_stop)
 
+print("max number of completed jobs: " + str(completed_stop) + ", number of jobs fed: " + str(len(jobs)))
+# maximum number of completed jobs must not exceed number of new jobs, otherwise equal them to each other
+if completed_stop > len(jobs):
+    completed_stop = len(jobs)
+print("max number of completed jobs: " + str(completed_stop) + ", number of jobs fed: " + str(len(jobs)))
 
-ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed)
+# initial round
+print("master: " + str(master) + ", type: NA, next arrival: " + str(next_arrival) + ", next departure: " + str(next_departure) + ", job list: " + str(job_list)  + ", cumulative response: " + str(response) + ", completed jobs: " + str(completed) + ", server busy: " + str(server))
+ps_server(s, jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed, completed_stop)
