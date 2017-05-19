@@ -71,12 +71,10 @@ first_event = True
 response = 0
 # number of completed jobs at the end of simulation
 completed = 0
-# simulation length chosen based on master clock
-Tend = 15
 # chosen simulation duration parameter to stop simulation
 completed_stop = 4
 
-def ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed, Tend):
+def ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed:
     if completed == completed_stop:
         return
     
@@ -188,7 +186,7 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
         first_event = False
     
     # recursion
-    ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed, Tend)
+    ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed)
 
 
-ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed, Tend)
+ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed)
