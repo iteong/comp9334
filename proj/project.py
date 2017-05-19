@@ -74,10 +74,7 @@ completed = 0
 # chosen simulation duration parameter to stop simulation
 completed_stop = 4
 
-def ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed:
-    if completed == completed_stop:
-        return
-    
+def ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed):
     # BASE CASE FOR RECURSION
     # number of completed jobs reached its chosen limit after a job departs
     if completed == completed_stop:
