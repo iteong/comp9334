@@ -71,20 +71,32 @@ first_event = True
 response = 0
 # number of completed jobs at the end of simulation
 completed = 0
+# simulation length chosen based on master clock
+Tend = 15
+# chosen simulation duration parameter to stop simulation
+completed_stop = 4
 
-def ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed):
-    # base case for recursion when no jobs left to process after last job departs
-    if first_event == False and len(jobs) == 0:
-        next_arrival = np.inf       
-        event_type = "DEPARTURE"
-        master = next_departure
-        next_departure = np.inf
-        response += (master - job_list[0][0])
-        completed += 1
-        job_list.pop(0)
-        server = False
-        print("master: " + str(master) + ", type: " + event_type + ", next arrival: " + str(next_arrival) + ", next departure: " + str(next_departure) + ", job list: " + str(job_list)  + ", cumulative response: " + str(response) + ", completed jobs: " + str(completed) + ", server busy: " + str(server))
+def ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed, Tend):
+    if completed == completed_stop:
         return
+    
+    # BASE CASE FOR RECURSION
+    # number of completed jobs reached its chosen limit after a job departs
+    if completed == completed_stop:
+        return    
+    else:
+        # no jobs left to process after last job departs
+        if first_event == False and len(jobs) == 0:
+            next_arrival = np.inf       
+            event_type = "DEPARTURE"
+            master = next_departure
+            next_departure = np.inf
+            response += (master - job_list[0][0])
+            completed += 1
+            job_list.pop(0)
+            server = False
+            print("master: " + str(master) + ", type: " + event_type + ", next arrival: " + str(next_arrival) + ", next departure: " + str(next_departure) + ", job list: " + str(job_list)  + ", cumulative response: " + str(response) + ", completed jobs: " + str(completed) + ", server busy: " + str(server))
+            return
     
     # tracking time of last event
     last_event = master
@@ -95,7 +107,11 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
         master = next_arrival       
     else:
         event_type = "DEPARTURE"
-        master = next_departure 
+        master = next_departure
+
+    # check length of simulation to stop before Tend
+    #if master >= Tend:
+        #return
     
     # tracking time lapsed since last event, after master clock's jump
     time_lapsed = round(master - last_event, 2)
@@ -172,10 +188,7 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
         first_event = False
     
     # recursion
-    ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed)
+    ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed, Tend)
 
 
-
-
-
-ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed)
+ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed, Tend)
