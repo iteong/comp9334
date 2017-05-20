@@ -3,34 +3,42 @@ import operator
 import random
 import math
 from datetime import datetime
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
-###### 1) HELPER FUNCTIONS TO SEED AND GENERATE RANDOM ARRIVAL AND SERVICE TIME ######
+###### 1) WRITING SEED INTO FILE/REPRODUCE USING SEED AND LENGTH OF SIMULATION BASED ON COMPLETED JOBS ######
+
+# reproducibility
+reproduce = int(input("Choose 1 to run simulation based on random seed of current time, or choose 2 to reproduce past simulation: "))
+if reproduce == 1:
+    # seeding random based on current time and writing into text file for reproducibility  
+    seed = datetime.strftime(datetime.now(), '%Y-%m-%d-%H-%M-%S')
+    f = open('seed.txt', 'a')
+    f.write(str(seed))
+    f.write('\n')
+    f.close()
+elif reproduce == 2:
+    seed = str(input("Enter the seed of current time recorded: "))
+
+# chosen simulation duration parameter to stop simulation
+completed_stop = int(input("Choose the maximum number of completed jobs after a job departure (length of simulation): "))
+
+
+###### 2) HELPER FUNCTIONS TO SEED AND GENERATE RANDOM ARRIVAL AND SERVICE TIMES BASED ON SEED ######
 
 
 # INTER-ARRIVAL TIMES FOR EACH JOB
 mean_arrival_rate = 7.2
 
-def randExponential(rateLambda):
-    return -math.log(1.0 - random.random()) / rateLambda
-
-def randUniform(a, b):
-    return random.uniform(a, b)
-
-def readSeed(n):
-    f = open('seed.txt', 'r')
-    for i, line in enumerate(f):
-        if i == n:
-            return line
-    f.close()
-
 def interArrival():
-    a1 = randExponential(mean_arrival_rate)
-    a2 = randUniform(0.75, 1.17)
+    random.seed(seed)
+    a1 = -math.log(1.0 - random.random()) / mean_arrival_rate
+    a2 = random.uniform(0.75, 1.17)
     interarrival_time = round(a1 * a2, 2)
     return interarrival_time
 
-def serviceTime(s):
+def serviceTime():
     power_budget = 2000
     power_level = power_budget/s
 
@@ -40,28 +48,15 @@ def serviceTime(s):
     alpha1 = 0.43
     alpha2 = 0.98
     beta = 0.86
-    
-    r = randUniform(0, 1)
+
+    random.seed(seed)
+    r = random.uniform(0, 1)
     gamma = (1 - beta)/( (alpha2**(1-beta)) - (alpha1**(1-beta)) )
     
     # inversed CDF (generated from given PDF)
     t = (( ((r*(1-beta))/gamma) + (alpha1 ** (1-beta)) )**(1/(1-beta)))/freq
 
     return t
-
-
-###### 2) WRITING SEED INTO FILE AND LENGTH OF SIMULATION BASED ON COMPLETED JOBS ######
-
-
-# seeding random based on current time and writing into text file for reproducibility
-seed = datetime.strftime(datetime.now(), '%Y-%m-%d-%H-%M-%S')
-f = open('seed.txt', 'a')
-#f.write(seed + '\n')
-f.close()
-random.seed(seed)
-
-# chosen simulation duration parameter to stop simulation
-completed_stop = int(input("Choose the maximum number of completed jobs after a job departure (length of simulation): "))
 
 
 ###### 3) CHOOSE LIST OF JOBS USING TEST CASE OR THROUGH RANDOM GENERATION ######
@@ -72,12 +67,12 @@ master = 0
 new_arrival = master
 
 # generate a list of jobs with randomly-generated arrival times and service times
-def generateJobList(s, new_arrival, jobs, max_num_jobs):
+def generateJobList(new_arrival, jobs, max_num_jobs):
     for x in range(max_num_jobs):
         # GENERATE A NEW JOB: randomly-generated arrival (incremental) and service times
         new_interarrival = round(interArrival(), 2)
         new_arrival += new_interarrival
-        new_service = round(serviceTime(s), 2)
+        new_service = round(serviceTime(), 2)
         jobs.append([new_arrival, new_service])
     return jobs
 
@@ -92,7 +87,7 @@ else:
     s = int(input("Choose the number of servers to switch on: ")) # 3, 4, 5, 6, 7, 8, 9, 10
     
     jobs_init = []
-    jobs = generateJobList(s, new_arrival, jobs_init, max_num_jobs)
+    jobs = generateJobList(new_arrival, jobs_init, max_num_jobs)
     print("\nList of jobs to be fed into the simulation: " + str(jobs))
 
 
@@ -119,6 +114,10 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
     # BASE CASE FOR RECURSION
     # number of completed jobs reached its chosen limit after a job departs
     if completed == completed_stop:
+
+        mean_response = response/completed
+        print("MEAN RESPONSE TIME: " + str(mean_response))
+            
         return    
     else:
         print("List of jobs being fed into simulation: " + str(jobs))
@@ -133,6 +132,10 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
             job_list.pop(0)
             server = False
             print("master: " + str(master) + ", type: " + event_type + ", next arrival: " + str(next_arrival) + ", next departure: " + str(next_departure) + ", job list: " + str(job_list)  + ", cumulative response: " + str(response) + ", completed jobs: " + str(completed) + ", server busy: " + str(server) + "\n")
+
+            mean_response = response/completed
+            print("MEAN RESPONSE TIME: " + str(mean_response))
+            
             return
 
     # tracking time of last event
@@ -233,3 +236,4 @@ if completed_stop > len(jobs):
 print("\nList of jobs being fed into simulation: " + str(jobs))
 print("master: " + str(master) + ", type: NAN, next arrival: " + str(next_arrival) + ", next departure: " + str(next_departure) + ", job list: " + str(job_list)  + ", cumulative response: " + str(response) + ", completed jobs: " + str(completed) + ", server busy: " + str(server) + "\n")
 ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed, completed_stop)
+
