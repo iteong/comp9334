@@ -5,7 +5,7 @@ import math
 from datetime import datetime
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import sys
 
 ###### 1) WRITING SEED INTO FILE/REPRODUCE USING SEED AND LENGTH OF SIMULATION BASED ON COMPLETED JOBS ######
 
@@ -14,12 +14,16 @@ reproduce = int(input("Choose 1 to run simulation based on random seed of curren
 if reproduce == 1:
     # seeding random based on current time and writing into text file for reproducibility  
     seed = datetime.strftime(datetime.now(), '%Y-%m-%d-%H-%M-%S')
+    print("Seed of date and time stored in seed.txt: " + seed)
     f = open('seed.txt', 'a')
     f.write(str(seed))
     f.write('\n')
     f.close()
 elif reproduce == 2:
     seed = str(input("Enter the seed of current time recorded: "))
+else:
+    print("Invalid input!")
+    sys.exit()
 
 # chosen simulation duration parameter to stop simulation
 completed_stop = int(input("Choose the maximum number of completed jobs after a job departure (length of simulation): "))
@@ -30,12 +34,12 @@ completed_stop = int(input("Choose the maximum number of completed jobs after a 
 
 # INTER-ARRIVAL TIMES FOR EACH JOB
 mean_arrival_rate = 7.2
+random.seed(seed)
 
 def interArrival():
-    random.seed(seed)
     a1 = -math.log(1.0 - random.random()) / mean_arrival_rate
     a2 = random.uniform(0.75, 1.17)
-    interarrival_time = round(a1 * a2, 2)
+    interarrival_time = a1 * a2
     return interarrival_time
 
 def serviceTime():
@@ -49,7 +53,7 @@ def serviceTime():
     alpha2 = 0.98
     beta = 0.86
 
-    random.seed(seed)
+    #random.seed(seed)
     r = random.uniform(0, 1)
     gamma = (1 - beta)/( (alpha2**(1-beta)) - (alpha1**(1-beta)) )
     
@@ -70,9 +74,10 @@ new_arrival = master
 def generateJobList(new_arrival, jobs, max_num_jobs):
     for x in range(max_num_jobs):
         # GENERATE A NEW JOB: randomly-generated arrival (incremental) and service times
-        new_interarrival = round(interArrival(), 2)
+        new_interarrival = interArrival()
         new_arrival += new_interarrival
-        new_service = round(serviceTime(), 2)
+        new_arrival = round(new_arrival, 3) # round off to 3 decimal places
+        new_service = round(serviceTime(), 3)
         jobs.append([new_arrival, new_service])
     return jobs
 
@@ -80,15 +85,21 @@ def generateJobList(new_arrival, jobs, max_num_jobs):
 choice = int(input("Choose 1 for test case's jobs, or choose 2 to generate jobs for trace-driven simulation: "))
 if choice == 1:
     jobs = [[1, 2.1],[2, 3.3],[3, 1.1],[5, 0.5],[15, 1.7]]
-else:
+elif choice == 2:
     # chosen number of jobs being fed into the simulation
     max_num_jobs = int(input("Choose the number of jobs to generate that will be fed into the simulation in a list: "))
     # number of servers switched on is s; power consumption (Watt) is power_budget or power_level
-    s = int(input("Choose the number of servers to switch on: ")) # 3, 4, 5, 6, 7, 8, 9, 10
+    s = int(input("Choose the number of servers to switch on (3, 4, 5, 6, 7, 8, 9, 10): "))
+    if s not in [3, 4, 5, 6, 7, 8, 9, 10]:
+        print("Invalid input!")
+        sys.exit()
     
     jobs_init = []
     jobs = generateJobList(new_arrival, jobs_init, max_num_jobs)
     print("\nList of jobs to be fed into the simulation: " + str(jobs))
+else:
+    print("Invalid input!")
+    sys.exit()
 
 
 ###### 4) SIMULATION OF PS SERVER WITH TRACE-DRIVEN SIMULATION USING LIST OF JOBS ######
