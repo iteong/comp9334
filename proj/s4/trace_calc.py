@@ -4,70 +4,57 @@ import math
 # number of replications
 n = 5
 
-start = int(input("Enter the line number (data point) that you want to start calculating from: "))
+transient = int(input("Enter the transient: "))
+num_jobs = 100 - transient
+start = transient + 1
 
 def iterate_from_line(f, start_from_line):
     return (l for i, l in dropwhile(lambda x: x[0] < start_from_line, enumerate(f)))
 
-# trace1: Iterate from nth line (data point) / completed job
+# trace1: Iterate from the line after the transient (data point) / completed job
 responses = []
 for line in iterate_from_line(open("trace1", "r"), start):
     line = line.rstrip('\n')
     line = float(line)
     responses.append(line)
-
-num_jobs = len(responses)
 mean1 = sum(responses) / num_jobs
-first = start - 1
-print("Mean response time for trace1 after ignoring the values from the first " + str(first) + " jobs to remove transient values: " + str(mean1))
+print("Mean response time for trace1 after ignoring the values from the first " + str(transient) + " jobs to remove transient values: " + str(mean1))
 
-# trace2: Iterate from nth line (data point) / completed job
+# trace2: Iterate from the line after the transient (data point) / completed job
 responses = []
 for line in iterate_from_line(open("trace2", "r"), start):
     line = line.rstrip('\n')
     line = float(line)
     responses.append(line)
-
-num_jobs = len(responses)
 mean2 = sum(responses) / num_jobs
-first = start - 1
-print("Mean response time for trace2 after ignoring the values from the first " + str(first) + " jobs to remove transient values: " + str(mean2))
+print("Mean response time for trace2 after ignoring the values from the first " + str(transient) + " jobs to remove transient values: " + str(mean2))
 
-# trace3: Iterate from nth line (data point) / completed job
+# trace3: Iterate from the line after the transient (data point) / completed job
 responses = []
 for line in iterate_from_line(open("trace3", "r"), start):
     line = line.rstrip('\n')
     line = float(line)
     responses.append(line)
-
-num_jobs = len(responses)
 mean3 = sum(responses) / num_jobs
-first = start - 1
-print("Mean response time for trace3 after ignoring the values from the first " + str(first) + " jobs to remove transient values: " + str(mean3))
+print("Mean response time for trace3 after ignoring the values from the first " + str(transient) + " jobs to remove transient values: " + str(mean3))
 
-# trace4: Iterate from nth line (data point) / completed job
+# trace4: Iterate from the line after the transient (data point) / completed job
 responses = []
 for line in iterate_from_line(open("trace4", "r"), start):
     line = line.rstrip('\n')
     line = float(line)
     responses.append(line)
-
-num_jobs = len(responses)
 mean4 = sum(responses) / num_jobs
-first = start - 1
-print("Mean response time for trace4 after ignoring the values from the first " + str(first) + " jobs to remove transient values: " + str(mean4))
+print("Mean response time for trace4 after ignoring the values from the first " + str(transient) + " jobs to remove transient values: " + str(mean4))
 
-# trace5: Iterate from nth line (data point) / completed job
+# trace5: Iterate from the line after the transient (data point) / completed job
 responses = []
 for line in iterate_from_line(open("trace5", "r"), start):
     line = line.rstrip('\n')
     line = float(line)
     responses.append(line)
-
-num_jobs = len(responses)
 mean5 = sum(responses) / num_jobs
-first = start - 1
-print("Mean response time for trace5 after ignoring the values from the first " + str(first) + " jobs to remove transient values: " + str(mean5))
+print("Mean response time for trace5 after ignoring the values from the first " + str(transient) + " jobs to remove transient values: " + str(mean5))
 
 # calculating sample mean
 sample_mean = sum([mean1,mean2,mean3,mean4,mean5])/n
