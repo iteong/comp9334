@@ -1,0 +1,7 @@
+x = [3 4 5 6 7 8 9 10]; %nb of servers
+ y = [55.7000153846 65.2632493151 69.9152085714 73.9996 79.720728 83.8023114286 87.1874293333 87.9992215385]; % list containing mean RT
+ err = [1.13792615046 2.19115590127 3.01190010473 4.0241964268 2.28711262704 2.49305412417 1.95124736955 1.94281699673]; % list containing STD
+
+ errorbar(x,y,err, 'o')
+ xlabel('number of turned on servers')
+ ylabel('Mean response times')

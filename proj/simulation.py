@@ -118,14 +118,27 @@ if choice == 1:
     f.write('\n')
     f.close()
 elif choice == 2:
+
+    # test case has number of servers switched on = 1
+    s = 2
+    # trace file for computing mean response times and remove transient
+    trace = str(input("Choose name of trace file to save values of each departing job's response time to (e.g. trace1): "))
+
+    jobs_init = []
     jobs = [[1, 2.1],[2, 3.3],[3, 1.1],[5, 0.5],[15, 1.7]]
+    ########print("\nList of jobs to be fed into the simulation: " + str(jobs))
+    f = open(filename, 'a')
+    f.write('List of jobs to be fed into the simulation: ' + str(jobs))
+    f.write('\n')
+    f.close()
 else:
     print("Invalid input!")
     sys.exit()
 
 
 ###### 4) SIMULATION OF PS SERVER WITH TRACE-DRIVEN SIMULATION USING LIST OF JOBS ######
-
+# ignore the jobs that do not belong to our observed server (e.g. for s = 3, it will only do job1, job4, job7, job10, skipping every 3 jobs)
+jobs = jobs[::s]
 
 # next arrival = first job in arriving jobs
 next_arrival = jobs[0][0]
