@@ -112,7 +112,7 @@ if choice == 1:
     
     jobs_init = []
     jobs = generateJobList(new_arrival, jobs_init, max_num_jobs)
-    print("\nList of jobs to be fed into the simulation: " + str(jobs))
+    ########print("\nList of jobs to be fed into the simulation: " + str(jobs))
     f = open(filename, 'a')
     f.write('List of jobs to be fed into the simulation: ' + str(jobs))
     f.write('\n')
@@ -157,7 +157,7 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
             
         return    
     else:
-        print("List of jobs being fed into simulation: " + str(jobs))
+        ########print("List of jobs being fed into simulation: " + str(jobs))
         # no jobs left to process after last job departs
         if first_event == False and len(jobs) == 0 and len(job_list) == 0:
             next_arrival = np.inf       
@@ -168,8 +168,8 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
             completed += 1
             job_list.pop(0)
             server = False
-            print("master: " + str(master) + ", type: " + event_type + ", next arrival: " + str(next_arrival) + ", next departure: " + str(next_departure) + ", job list: " + str(job_list)  + ", cumulative response: " + str(response) + ", completed jobs: " + str(completed) + ", server busy: " + str(server) + "\n")
-
+            ########print("master: " + str(master) + ", type: " + event_type + ", next arrival: " + str(next_arrival) + ", next departure: " + str(next_departure) + ", job list: " + str(job_list)  + ", cumulative response: " + str(response) + ", completed jobs: " + str(completed) + ", server busy: " + str(server) + "\n")
+            
             mean_response = response/completed
             print("MEAN RESPONSE TIME: " + str(mean_response))
             
@@ -259,8 +259,8 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
 
         # only remove job from jobs if there is an arrival next
         jobs.pop(0)
-
-    print("master: " + str(master) + ", type: " + event_type + ", next arrival: " + str(next_arrival) + ", next departure: " + str(next_departure) + ", job list: " + str(job_list)  + ", cumulative response: " + str(response) + ", completed jobs: " + str(completed) + ", server busy: " + str(server) + "\n")
+        
+    ########print("master: " + str(master) + ", type: " + event_type + ", next arrival: " + str(next_arrival) + ", next departure: " + str(next_departure) + ", job list: " + str(job_list)  + ", cumulative response: " + str(response) + ", completed jobs: " + str(completed) + ", server busy: " + str(server) + "\n")
     
     if first_event == True:
         # prepare for base case in recursion
@@ -276,7 +276,7 @@ if completed_stop > len(jobs):
     print("\nInput of max number of completed jobs is larger than number of new jobs in list, so reduced max number from " + str(completed_stop) + " to the same number as number of jobs fed into simulation: " + str(len(jobs)))
 
 # initial round
-print("\nList of jobs being fed into simulation: " + str(jobs))
+########print("\nList of jobs being fed into simulation: " + str(jobs))
 print("master: " + str(master) + ", type: NAN, next arrival: " + str(next_arrival) + ", next departure: " + str(next_departure) + ", job list: " + str(job_list)  + ", cumulative response: " + str(response) + ", completed jobs: " + str(completed) + ", server busy: " + str(server) + "\n")
 ps_server(jobs, master, next_arrival, next_departure, job_list, server, first_event, response, completed, completed_stop)
 
