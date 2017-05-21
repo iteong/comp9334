@@ -9,25 +9,37 @@ import sys
 
 ###### 1) WRITING SEED INTO FILE/REPRODUCE USING SEED AND LENGTH OF SIMULATION BASED ON COMPLETED JOBS ######
 
+filename = str(input("Choose name of text file to save values to (e.g. transient): "))
+filename = filename + '.txt'
+
 # reproducibility
 reproduce = int(input("Choose 1 to run simulation based on random seed of current time, or choose 2 to reproduce past simulation: "))
 if reproduce == 1:
     # seeding random based on current time and writing into text file for reproducibility  
     seed = datetime.strftime(datetime.now(), '%Y-%m-%d-%H-%M-%S')
     print("Seed of date and time stored in seed.txt: " + seed)
-    f = open('seed.txt', 'a')
-    f.write(str(seed))
+    f = open(filename, 'a')
+    f.write('\n' + '########## NEW SIMULATION ##########')
+    f.write('\n' + str(seed))
     f.write('\n')
     f.close()
 elif reproduce == 2:
     seed = str(input("Enter the seed of current time recorded: "))
+    f = open(filename, 'a')
+    f.write('\n' + '########## REPRODUCED SIMULATION ##########')
+    f.write('\n' + str(seed))
+    f.write('\n')
+    f.close()
 else:
     print("Invalid input!")
     sys.exit()
 
 # chosen simulation duration parameter to stop simulation
 completed_stop = int(input("Choose the maximum number of completed jobs after a job departure (length of simulation): "))
-
+f = open(filename, 'a')
+f.write('Maximum number of completed jobs (length of simulation): ' + str(completed_stop))
+f.write('\n')
+f.close()
 
 ###### 2) HELPER FUNCTIONS TO SEED AND GENERATE RANDOM ARRIVAL AND SERVICE TIMES BASED ON SEED ######
 
@@ -82,10 +94,8 @@ def generateJobList(new_arrival, jobs, max_num_jobs):
     return jobs
 
 # choose if you want test case for the jobs, or choose to generate jobs
-choice = int(input("Choose 1 for test case's jobs, or choose 2 to generate jobs for trace-driven simulation: "))
+choice = int(input("Choose 1 to generate jobs for trace-driven simulation, or choose 2 to use jobs from test case: "))
 if choice == 1:
-    jobs = [[1, 2.1],[2, 3.3],[3, 1.1],[5, 0.5],[15, 1.7]]
-elif choice == 2:
     # chosen number of jobs being fed into the simulation
     max_num_jobs = int(input("Choose the number of jobs to generate that will be fed into the simulation in a list: "))
     # number of servers switched on is s; power consumption (Watt) is power_budget or power_level
@@ -93,10 +103,21 @@ elif choice == 2:
     if s not in [3, 4, 5, 6, 7, 8, 9, 10]:
         print("Invalid input!")
         sys.exit()
+    else:
+        f = open(filename, 'a')
+        f.write('Number of servers switched on: ' + str(s))
+        f.write('\n')
+        f.close()
     
     jobs_init = []
     jobs = generateJobList(new_arrival, jobs_init, max_num_jobs)
     print("\nList of jobs to be fed into the simulation: " + str(jobs))
+    f = open(filename, 'a')
+    f.write('List of jobs to be fed into the simulation: ' + str(jobs))
+    f.write('\n')
+    f.close()
+elif choice == 2:
+    jobs = [[1, 2.1],[2, 3.3],[3, 1.1],[5, 0.5],[15, 1.7]]
 else:
     print("Invalid input!")
     sys.exit()
@@ -128,6 +149,10 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
 
         mean_response = response/completed
         print("MEAN RESPONSE TIME: " + str(mean_response))
+        f = open(filename, 'a')
+        f.write('Mean Response Time: ' + str(mean_response))
+        f.write('\n')
+        f.close()
             
         return    
     else:
