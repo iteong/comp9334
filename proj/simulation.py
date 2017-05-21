@@ -3,13 +3,11 @@ import operator
 import random
 import math
 from datetime import datetime
-import matplotlib.pyplot as plt
-import seaborn as sns
 import sys
 
 ###### 1) WRITING SEED INTO FILE/REPRODUCE USING SEED AND LENGTH OF SIMULATION BASED ON COMPLETED JOBS ######
 
-filename = str(input("Choose name of text file to save values to (e.g. transient): "))
+filename = str(input("Choose name of text file to save values for recording seed values for simulation (e.g. sim1): "))
 filename = filename + '.txt'
 
 # reproducibility
@@ -108,6 +106,9 @@ if choice == 1:
         f.write('Number of servers switched on: ' + str(s))
         f.write('\n')
         f.close()
+
+    # trace file for computing mean response times and remove transient
+    trace = str(input("Choose name of trace file to save values of each departing job's response time to (e.g. trace1): "))
     
     jobs_init = []
     jobs = generateJobList(new_arrival, jobs_init, max_num_jobs)
@@ -205,6 +206,12 @@ def ps_server(jobs, master, next_arrival, next_departure, job_list, server, firs
         
         # calculate cumulative response time based on departing job's arrival and departure times
         response += (master - job_list[min_index][0])
+
+        # add the job's response time into a trace file to compute the trace file needed to remove transient       
+        tracefile = open(trace, 'a')
+        tracefile.write(str(master - job_list[min_index][0]))
+        tracefile.write('\n')
+        tracefile.close()
 
         # add to completed jobs when a job departs
         completed += 1
