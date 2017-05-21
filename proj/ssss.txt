@@ -1,0 +1,6 @@
+
+########## NEW SIMULATION ##########
+2017-05-21-22-53-23
+Maximum number of completed jobs (length of simulation): 5
+List of jobs to be fed into the simulation: [[1, 2.1], [2, 3.3], [3, 1.1], [5, 0.5], [15, 1.7]]
+Mean Response Time: 1.7
