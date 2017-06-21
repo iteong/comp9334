@@ -1,3 +1,5 @@
+from __future__ import division
+
 # E = utilisation = arr_rate/service_rate; N = number of operators/terminals
 def ErlangB(E, N):
     InvB = 1.0
